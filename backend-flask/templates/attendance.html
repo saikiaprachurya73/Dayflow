@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head><title>Attendance</title></head>
+<body>
+    <h1>Attendance Page</h1>
+
+    <form action="/checkin" method="post">
+        <button type="submit">Check In</button>
+    </form>
+
+    <form action="/checkout" method="post">
+        <button type="submit">Check Out</button>
+    </form>
+
+    <h3>History</h3>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Date</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Status</th>
+        </tr>
+        {% for row in history %}
+        <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.check_in }}</td>
+            <td>{{ row.check_out }}</td>
+            <td>{{ row.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

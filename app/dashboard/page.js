@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/useAuth";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, query, where, getDocs, orderBy } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 
 function getTodayDate() {
   const d = new Date();
@@ -22,11 +22,11 @@ export default function Dashboard() {
   const fetchAttendance = async () => {
     const q = query(
       collection(db, "attendance"),
-      where("userId", "==", user.uid),
-      orderBy("date", "desc")
+      where("userId", "==", user.uid)
     );
     const snap = await getDocs(q);
-    const records = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const records = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    records.sort((a, b) => (a.date < b.date ? 1 : -1)); // newest first
     setHistory(records);
     const today = records.find((r) => r.date === getTodayDate());
     setTodayRecord(today || null);
@@ -48,7 +48,6 @@ export default function Dashboard() {
   const handleCheckOut = async () => {
     if (!todayRecord) return;
     setBusy(true);
-    const { doc, updateDoc } = await import("firebase/firestore");
     await updateDoc(doc(db, "attendance", todayRecord.id), {
       checkOut: new Date().toISOString(),
     });

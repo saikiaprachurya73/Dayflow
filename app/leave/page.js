@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/useAuth";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, query, where, getDocs, orderBy } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
 export default function Leave() {
   const { user, loading } = useAuth();
@@ -18,11 +18,12 @@ export default function Leave() {
   const fetchMyLeaves = async () => {
     const q = query(
       collection(db, "leaves"),
-      where("userId", "==", user.uid),
-      orderBy("createdAt", "desc")
+      where("userId", "==", user.uid)
     );
     const snap = await getDocs(q);
-    setMyLeaves(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    const records = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    records.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    setMyLeaves(records);
   };
 
   const handleSubmit = async (e) => {
